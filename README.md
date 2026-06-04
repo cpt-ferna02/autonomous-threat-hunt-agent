@@ -10,7 +10,9 @@ This is not "send logs to an LLM and print a summary." This is a **ReAct-pattern
 
 ## 🎬 Demo
 
-> *(Demo video coming soon — recording in progress)*
+[![Autonomous Threat Hunt Agent Demo](https://img.youtube.com/vi/PfR0Lsf4X50/0.jpg)](https://www.youtube.com/watch?v=PfR0Lsf4X50)
+
+*Click to watch — autonomous threat hunt investigation from start to full SOC report in under 2 minutes.*
 
 ---
 
